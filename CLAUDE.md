@@ -9,6 +9,20 @@ Single LLM (Groq, llama-3.3-70b-versatile), four sequential roles:
 
 ## Agent interfaces
 
+### Prompt Engineer (`agents/prompt_engineer.py`)
+- **Input:** `scout_output: ScoutOutput`
+- **Output:** `GeneratedPrompt` dataclass
+  ```json
+  {
+    "system_prompt": "<full system prompt text>",
+    "selected_tools": ["<tool>", ...]
+  }
+  ```
+- **Available tools:** `grep`, `linter`, `security_scanner`, `style_checker`, `complexity_analyzer`
+  — only tools relevant to the language and risks are selected; any value not in this list is filtered out
+- **LLM call:** `temperature=0.4`
+- **Input to LLM:** `ScoutOutput` serialized as JSON via `dataclasses.asdict()`
+
 ### Scout (`agents/scout.py`)
 - **Input:** `code: str` — raw source code, no assumptions about language or domain
 - **Output:** `ScoutOutput` dataclass

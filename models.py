@@ -15,7 +15,8 @@ class ScoutOutput:
 class GeneratedPrompt:
     """System prompt produced by the prompt engineer."""
     system_prompt: str = ""
-    rationale: str = ""  # why the prompt was structured this way
+    selected_tools: list[str] = field(default_factory=list)
+    raw: str = ""
 
 
 @dataclass
