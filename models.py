@@ -31,11 +31,9 @@ class Review:
 @dataclass
 class Evaluation:
     """Evaluator's assessment of a review."""
-    score: float = 0.0          # 0–10
-    strengths: list[str] = field(default_factory=list)
-    weaknesses: list[str] = field(default_factory=list)
-    refinement_needed: bool = False
-    refinement_hint: str = ""   # passed back to prompt engineer on re-run
+    score: float = 0.0
+    reasoning: str = ""
+    needs_refinement: bool = False  # True when score < config.QUALITY_THRESHOLD
     raw: str = ""
 
 

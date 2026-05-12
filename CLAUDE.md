@@ -9,6 +9,19 @@ Single LLM (Groq, llama-3.3-70b-versatile), four sequential roles:
 
 ## Agent interfaces
 
+### Evaluator (`agents/evaluator.py`)
+- **Input:** `review: Review`
+- **Output:** `Evaluation` dataclass
+  ```json
+  {
+    "score": <float 0.0–10.0>,
+    "reasoning": "<one paragraph explaining the score>"
+  }
+  ```
+- **`needs_refinement`:** set to `True` when `score < config.QUALITY_THRESHOLD` (default 7.0)
+- **LLM call:** `temperature=0.3`
+- **Input to LLM:** `Review` serialized as JSON via `dataclasses.asdict()`
+
 ### Executor (`agents/executor.py`)
 - **Input:** `code: str`, `generated_prompt: GeneratedPrompt`
 - **Output:** `Review` dataclass
