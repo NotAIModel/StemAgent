@@ -77,7 +77,20 @@ The two samples exist specifically to prove environment-driven specialization: t
 scout produces a Python-flavored spec for one and a C++-flavored spec for the other,
 with no hardcoded language logic.
 
+## Baseline (`baseline.py`)
+Generic review with no specialization — used as the "before" measurement.
+- System prompt: `"You are a code reviewer. Review the following code and identify issues."`
+- Same `Review` dataclass and JSON output schema as the executor
+- `temperature=0.3`
+
 ## Experiments
+`experiments/before_after.py` — runs baseline and full stem agent pipeline on `samples/sample.py`,
+prints comment counts, severity counts, and summaries side by side, then prints a DELTA section
+showing exactly how many more issues the stem agent found. Run with:
+```
+venv/bin/python experiments/before_after.py
+```
+
 `experiments/compare_specialization.py` — runs `scout.run()` on both sample files and
 prints a side-by-side comparison (`language`, `focus_areas`, `risks`, `reviewer_persona`),
 plus a diff of which focus areas are unique to each language. Run with:
