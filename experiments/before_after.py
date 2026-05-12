@@ -14,7 +14,7 @@ from agents.prompt_engineer import run as pe_run
 from agents.executor import run as exec_run
 from models import Review
 
-SAMPLE = Path(__file__).parent.parent / "samples" / "sample.py"
+DEFAULT_SAMPLE = Path(__file__).parent.parent / "samples" / "sample.py"
 
 
 def run_stem_agent(code: str) -> Review:
@@ -35,7 +35,9 @@ def print_review(label: str, review: Review) -> None:
 
 
 def main() -> None:
-    code = SAMPLE.read_text()
+    sample = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_SAMPLE
+    print(f"File: {sample.name}\n")
+    code = sample.read_text()
 
     print("Running baseline ...")
     base = baseline.run(code)
