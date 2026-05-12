@@ -23,6 +23,26 @@ Single LLM (Groq, llama-3.3-70b-versatile), four sequential roles:
 - **LLM call:** `temperature=0.3` (low — deterministic analysis)
 - **JSON parsing:** strips accidental markdown fences before parsing
 
+## Sample files
+Two intentionally flawed files used as review targets:
+
+| File | Issues planted |
+|---|---|
+| `samples/sample.py` | SQL injection, unclosed file handle, `!= None`, manual index loop |
+| `samples/sample.cpp` | Memory leak, buffer overflow, raw pointer, missing `virtual` destructor, unhandled exception |
+
+The two samples exist specifically to prove environment-driven specialization: the same
+scout produces a Python-flavored spec for one and a C++-flavored spec for the other,
+with no hardcoded language logic.
+
+## Experiments
+`experiments/compare_specialization.py` — runs `scout.run()` on both sample files and
+prints a side-by-side comparison (`language`, `focus_areas`, `risks`, `reviewer_persona`),
+plus a diff of which focus areas are unique to each language. Run with:
+```
+venv/bin/python experiments/compare_specialization.py
+```
+
 ## Rules
 - All inter-agent communication in JSON
 - No LangChain or agent frameworks — raw API calls only
