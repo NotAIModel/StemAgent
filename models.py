@@ -22,8 +22,10 @@ class GeneratedPrompt:
 @dataclass
 class Review:
     """Code review produced by the executor."""
-    content: str = ""
-    system_prompt_used: str = ""  # which system prompt drove this review
+    comments: list[str] = field(default_factory=list)
+    severity_counts: dict = field(default_factory=lambda: {"high": 0, "medium": 0, "low": 0})
+    summary: str = ""
+    raw: str = ""
 
 
 @dataclass

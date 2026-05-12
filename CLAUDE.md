@@ -9,6 +9,21 @@ Single LLM (Groq, llama-3.3-70b-versatile), four sequential roles:
 
 ## Agent interfaces
 
+### Executor (`agents/executor.py`)
+- **Input:** `code: str`, `generated_prompt: GeneratedPrompt`
+- **Output:** `Review` dataclass
+  ```json
+  {
+    "comments": ["<finding>", ...],
+    "severity_counts": {"high": <n>, "medium": <n>, "low": <n>},
+    "summary": "<one-paragraph overall assessment>"
+  }
+  ```
+- **System prompt:** `generated_prompt.system_prompt` + appended JSON schema instruction
+  (the append ensures parseable output regardless of how the prompt engineer phrased things)
+- **User prompt:** `"Review the following code:\n\n{code}\n\nAlso note these tools are available to you: {tools}"`
+- **LLM call:** `temperature=0.3` (low — consistent, deterministic findings)
+
 ### Prompt Engineer (`agents/prompt_engineer.py`)
 - **Input:** `scout_output: ScoutOutput`
 - **Output:** `GeneratedPrompt` dataclass
