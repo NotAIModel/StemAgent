@@ -28,10 +28,10 @@ def run(code: str) -> dict:
         if not evaluation.needs_refinement:
             break
 
-        refinement_rounds += 1
-        if refinement_rounds > config.MAX_REFINEMENT_ROUNDS:
-            break
+        if refinement_rounds >= config.MAX_REFINEMENT_ROUNDS:
+            break  # budget exhausted — accept current review
 
+        refinement_rounds += 1
         print(f"Refining (round {refinement_rounds})...")
         generated_prompt = prompt_engineer.run(scout_output)
 
