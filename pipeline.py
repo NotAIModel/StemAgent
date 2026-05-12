@@ -1,46 +1,44 @@
 """
-Orchestrates the four agents in sequence.
-Handles the refinement loop: if the evaluator scores below the threshold,
-it sends the hint back to the prompt engineer and re-runs executor + evaluator.
+Orchestrates the four agents in sequence with an optional refinement loop.
 """
 
 import config
-import baseline
 from agents import scout, prompt_engineer, executor, evaluator
-from models import PipelineResult
+from models import ScoutOutput, GeneratedPrompt, Review, Evaluation
 
 
-def run(code: str) -> PipelineResult:
-    result = PipelineResult()
+def run(code: str) -> dict:
+    print("Scouting...")
+    scout_output: ScoutOutput = scout.run(code)
 
-    # Step 0 — baseline (generic, no specialization)
-    result.baseline_review = baseline.run(code)
+    print("Specializing...")
+    generated_prompt: GeneratedPrompt = prompt_engineer.run(scout_output)
 
-    # Step 1 — scout
-    result.scout_output = scout.run()
+    review: Review | None = None
+    evaluation: Evaluation | None = None
+    refinement_rounds = 0
 
-    # Step 2 — prompt engineer (initial pass)
-    result.generated_prompt = prompt_engineer.run(result.scout_output)
+    for _ in range(config.MAX_REFINEMENT_ROUNDS + 1):
+        print("Reviewing...")
+        review = executor.run(code, generated_prompt)
 
-    # Steps 3 + 4 — execute then evaluate, with optional refinement loop
-    refinement_hint = ""
-    for round_num in range(1, config.MAX_REFINEMENT_ROUNDS + 2):
-        result.rounds = round_num
+        print("Evaluating...")
+        evaluation = evaluator.run(review)
 
-        if round_num > 1:
-            # Re-run prompt engineer with feedback before re-executing
-            result.generated_prompt = prompt_engineer.run(
-                result.scout_output, refinement_hint=refinement_hint
-            )
-
-        result.specialized_review = executor.run(code, result.generated_prompt)
-        result.evaluation = evaluator.run(result.specialized_review)
-
-        if not result.evaluation.refinement_needed:
+        if not evaluation.needs_refinement:
             break
-        if round_num >= config.MAX_REFINEMENT_ROUNDS + 1:
-            break  # exhausted budget
 
-        refinement_hint = result.evaluation.refinement_hint
+        refinement_rounds += 1
+        if refinement_rounds > config.MAX_REFINEMENT_ROUNDS:
+            break
 
-    return result
+        print(f"Refining (round {refinement_rounds})...")
+        generated_prompt = prompt_engineer.run(scout_output)
+
+    return {
+        "scout":             scout_output,
+        "generated_prompt":  generated_prompt,
+        "review":            review,
+        "evaluation":        evaluation,
+        "refinement_rounds": refinement_rounds,
+    }

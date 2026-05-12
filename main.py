@@ -2,41 +2,51 @@ import sys
 import pipeline
 
 
-def load_code(path: str) -> str:
-    with open(path) as f:
-        return f.read()
-
-
-def print_result(result) -> None:
+def print_result(result: dict) -> None:
     sep = "-" * 60
+    scout    = result["scout"]
+    prompt   = result["generated_prompt"]
+    review   = result["review"]
+    ev       = result["evaluation"]
+    rounds   = result["refinement_rounds"]
 
-    print(sep)
-    print("BASELINE REVIEW (generic, no specialization)")
-    print(sep)
-    print(result.baseline_review.content)
+    print(f"\n{'=' * 60}")
+    print("  SCOUT")
+    print(f"{'=' * 60}")
+    print(f"language        : {scout.language}")
+    print(f"reviewer_persona: {scout.reviewer_persona}")
+    print(f"focus_areas     : {', '.join(scout.focus_areas)}")
+    print(f"risks ({len(scout.risks)}):")
+    for r in scout.risks:
+        print(f"  • {r}")
 
-    print(sep)
-    print("GENERATED SYSTEM PROMPT")
-    print(sep)
-    print(result.generated_prompt.system_prompt)
-    print(f"\nRationale: {result.generated_prompt.rationale}")
+    print(f"\n{'=' * 60}")
+    print("  GENERATED SYSTEM PROMPT")
+    print(f"{'=' * 60}")
+    print(prompt.system_prompt)
+    print(f"\nselected_tools: {prompt.selected_tools}")
 
-    print(sep)
-    print("SPECIALIZED REVIEW")
-    print(sep)
-    print(result.specialized_review.content)
+    print(f"\n{'=' * 60}")
+    print("  REVIEW")
+    print(f"{'=' * 60}")
+    sc = review.severity_counts
+    print(f"severity: {sc['high']} high  {sc['medium']} medium  {sc['low']} low")
+    print(f"comments ({len(review.comments)}):")
+    for c in review.comments:
+        print(f"  • {c}")
+    print(f"\nsummary:\n{review.summary}")
 
-    print(sep)
-    print("EVALUATION")
-    print(sep)
-    ev = result.evaluation
-    print(f"Score: {ev.score}/10  |  Rounds: {result.rounds}")
-    print("Strengths:", ", ".join(ev.strengths) or "—")
-    print("Weaknesses:", ", ".join(ev.weaknesses) or "—")
+    print(f"\n{'=' * 60}")
+    print("  EVALUATION")
+    print(f"{'=' * 60}")
+    print(f"score           : {ev.score}/10")
+    print(f"needs_refinement: {ev.needs_refinement}  (refinement rounds used: {rounds})")
+    print(f"reasoning:\n{ev.reasoning}")
 
 
 if __name__ == "__main__":
-    code_path = sys.argv[1] if len(sys.argv) > 1 else "samples/sample.py"
-    code = load_code(code_path)
+    path = sys.argv[1] if len(sys.argv) > 1 else "samples/sample.py"
+    with open(path) as f:
+        code = f.read()
     result = pipeline.run(code)
     print_result(result)

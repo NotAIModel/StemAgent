@@ -77,6 +77,24 @@ The two samples exist specifically to prove environment-driven specialization: t
 scout produces a Python-flavored spec for one and a C++-flavored spec for the other,
 with no hardcoded language logic.
 
+## Pipeline (`pipeline.py`)
+Single `run(code: str) -> dict` function. Keys returned:
+
+| Key | Type | Description |
+|---|---|---|
+| `scout` | `ScoutOutput` | Specialization spec inferred from the code |
+| `generated_prompt` | `GeneratedPrompt` | System prompt + selected tools |
+| `review` | `Review` | Final code review |
+| `evaluation` | `Evaluation` | Score and reasoning |
+| `refinement_rounds` | `int` | Number of extra review loops triggered |
+
+Refinement loop: if `evaluation.needs_refinement` is `True`, the prompt engineer is called
+again and the executor + evaluator re-run, up to `config.MAX_REFINEMENT_ROUNDS` extra times.
+
+Progress is printed at each stage: `Scouting...` → `Specializing...` → `Reviewing...` → `Evaluating...`
+
+**Entry point:** `python main.py [path/to/file]` (defaults to `samples/sample.py`)
+
 ## Baseline (`baseline.py`)
 Generic review with no specialization — used as the "before" measurement.
 - System prompt: `"You are a code reviewer. Review the following code and identify issues."`
