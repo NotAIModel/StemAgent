@@ -3,11 +3,12 @@ from dataclasses import dataclass, field
 
 @dataclass
 class ScoutOutput:
-    """What the scout learned about how code review is typically done."""
-    best_practices: list[str] = field(default_factory=list)
-    common_pitfalls: list[str] = field(default_factory=list)
-    review_dimensions: list[str] = field(default_factory=list)  # e.g. correctness, style, security
-    raw: str = ""  # full LLM response, kept for debugging
+    """What the scout inferred by analyzing the code sample."""
+    language: str = ""
+    focus_areas: list[str] = field(default_factory=list)   # e.g. ["security", "error handling"]
+    risks: list[str] = field(default_factory=list)          # concrete risks spotted in this code
+    reviewer_persona: str = ""                              # e.g. "security-focused senior engineer"
+    raw: str = ""                                           # raw LLM response, kept for debugging
 
 
 @dataclass
