@@ -2,10 +2,17 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+# Provider: "groq" or "openai" — default groq so existing tests are unaffected
+PROVIDER = os.environ.get("PROVIDER", "groq")
 
-# Single model used for all roles — swap to test different capabilities
-MODEL = "llama-3.3-70b-versatile"
+GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+
+MODEL_GROQ   = "llama-3.3-70b-versatile"
+MODEL_OPENAI = "gpt-4o-mini"
+
+# Legacy alias — used by agents that reference config.MODEL directly
+MODEL = MODEL_GROQ
 
 # How many refinement loops the pipeline is allowed before giving up
 MAX_REFINEMENT_ROUNDS = 2
