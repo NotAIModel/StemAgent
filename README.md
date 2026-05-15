@@ -5,7 +5,7 @@ A four-stage LLM pipeline for code review: Scout infers language and risks from 
 ## Setup
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/NotAIModel/StemAgent.git
 cd StemAgent
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
